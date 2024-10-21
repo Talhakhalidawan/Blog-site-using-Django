@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Home Page
+{% endblock  %}
+
+{% block body %}
+<div class="mt-4"></div>
+
+<div class="py-5">
+    <div class="container">
+        <div class="row row-cols-md-3"  data-masonry='{"percentPosition": true }'>
+
+            {% for post in post %}
+            <div class="col gallery-item mb-1">
+                <div class="card shadow-sm">
+            {% if post.name %}
+                    <div class="ms-3 mt-2 me-3 d-flex justify-content-between mb-1">
+                        <b class="text-info fs-5">
+                        {% if post.name %}
+                            {{post.name}}
+                        {% endif %}
+                        </b>
+                        <div>
+                            {% load my_filters %}
+                            <p class="text-secondary fs-c-1 mt-2 mb-0">
+                                {% if post.date == True %}
+                                {{ post.dateCreated|facebook_timestamp }}
+                                {% endif %}
+                                <span>
+                                    <button class="btn p-0 m-0 border-0">
+                                        <div class="dropdown">
+                                            <a class="btn p-0 border-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 16 23" fill="white" id="svg-id" class="bi bi-three-dots-vertical t-icon">
+                                                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                                </svg>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-end text-center fs-c-2 p-0 m-0">
+                                                <li><a class="dropdown-item" href="{{post.image.url}}" download="{{post.image.url}}">Download Image</a></li>
+                                                <li><a class="dropdown-item" href="/">Report</a></li>
+                                            </ul>
+                                        </div>
+                                    </button>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+            {% endif %}
+
+                    
+            <div class="ms-3 mb-2 mt-1 me-3">
+                {% if post.upImageCaption %}
+                    <p class="card-text">
+                        {{ post.upImageCaption|truncatewords:50 }}
+                        {% if post.upImageCaption|length > 50 %}
+                        <span class="more-text d-none">{{ post.upImageCaption }}</span>
+                        <a href="javascript:void(0)" class="toggle-more text-decoration-none fs-c-1">Read more</a>
+                        {% endif %}
+                    </p>
+                {% endif %}
+            </div>
+
+                    {% if post.image %}
+                    <div class="parent-img container">
+                        <img class="img post-img" src="{{post.image.url}}">
+                    </div>
+                    {% endif %}
+
+            
+                    <div class="ms-3 my-2 me-3">
+                        {% if post.downImageCaption %}
+                            <p class="card-text">
+                                {{ post.downImageCaption|truncatewords:50 }}
+                                {% if post.downImageCaption|length > 50 %}
+                                <span class="more-text d-none">{{ post.downImageCaption }}</span>
+                                <a href="javascript:void(0)" class="toggle-more text-decoration-none fs-c-1">Read more</a>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+
+
+                    
+                    <div id="fullscreenModal" class="fullscreen-modal" style="margin-top: -2px;">
+                        <span id="closeBtn" class="close">&times;</span>
+                        <img class="fullscreen-image" id="fullImage">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+.parent-img {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+}
+.parent-img img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.fs-c-1 {
+    font-size: 12px;
+}
+.fs-c-2 {
+    font-size: 12px;
+}
+.t-icon {
+    margin-right: -8px;
+}
+.fullscreen-modal {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0);
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+body.modal-open {
+    overflow: hidden;
+}
+.fullscreen-image {
+    max-width: 90%;
+    max-height: 90%;
+    box-shadow: 0px 0px 10px 2px rgba(255, 255, 255, 0.5);
+}
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+}
+body.modal-open .navbar {
+    display: none;
+}
+#gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-auto-rows: 1fr;
+    grid-gap: 10px;
+}
+.gallery-item {
+    grid-column: span 1;
+    grid-row-end: span 1;
+    position: relative;
+}
+</style>
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const postImages = document.querySelectorAll('.post-img');
+    const fullImage = document.getElementById('fullImage');
+    const modal = document.getElementById('fullscreenModal');
+    const closeModalBtn = document.getElementById('closeBtn');
+
+    postImages.forEach(image => {
+        image.addEventListener('click', () => {
+            fullImage.src = image.src;
+            modal.style.display = 'flex';
+            document.body.classList.add('modal-open');
+        });
+    });
+
+    // Close modal
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    });
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    });
+
+    document.querySelectorAll('.toggle-more').forEach(button => {
+        button.addEventListener('click', function() {
+            const moreText = this.previousElementSibling;
+            
+            if (moreText.classList.contains('d-none')) {
+                this.textContent = 'Read less';
+                moreText.classList.remove('d-none');
+            } else {
+                this.textContent = 'Read more';
+                moreText.classList.add('d-none');
+            }
+        });
+    });
+});
+
+
+</script>
+{% endblock  %}
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.setAttribute('data-bs-theme', savedTheme);
+    document.getElementById('btnName').textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+
+    document.getElementById('btnSwitch').addEventListener('click', () => {
+        const currentTheme = document.body.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.getElementById('btnName').textContent = newTheme === 'dark' ? 'Light' : 'Dark';
+        console.log('Theme switched to:', newTheme);  // Add this to verify the click event
+    });
+});
+    </script>
+{% endblock  %}

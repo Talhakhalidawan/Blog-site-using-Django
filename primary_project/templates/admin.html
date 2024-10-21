@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+Create Post
+{% endblock %}
+
+
+{% block navbar %}
+<nav class="p-2 bg-body-tertiary d-flex justify-content-between">
+    <a href="/" class="navbar-brand fw-bolder fs-5 p-0 ms-1">Home</a>
+    <a class="navbar-brand fw-bolder fs-3 p-0 text-info">Admin Page</a>
+    <a class="navbar-brand fw-bolder fs-3 p-0"></a>
+</nav>
+{% endblock %}
+
+
+{% block body %}
+
+<div class="container mt-4">
+{% for post in post %}
+    <div class="card p-0 mb-2">
+        <div class="card-body d-flex justify-content-between align-items-center flex-nowrap p-2">
+
+            <div class="image me-1">
+                <img class="rounded"
+
+                {% if post.image %}
+                src="{{post.image.url}}"
+                {% else %}
+                src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                {% endif %}
+                
+                alt="">
+            </div>
+
+            <div class="desc p-0 m-0">
+                <p class="m-0 text-limited">
+                    {% if post.upImageCaption %}
+                        {{post.upImageCaption}}
+                    {% elif post.downImageCaption %}
+                        {{post.downImageCaption}}
+                    {% else %}
+                        No caption...
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="buttons text-nowrap">
+                <a class="btn btn-sm btn-info" href="/update/{{post.uid}}">Update</a>
+                <a class="btn btn-sm btn-danger" href="/delete/{{post.uid}}">Delete</a>
+            </div>
+
+        </div>
+    </div>    
+{% endfor %}    
+
+
+</div>
+
+
+
+<style>
+    .image {
+        width: 60px;
+        height: 60px;
+    }
+    .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+<script>
+    function limitWords(selector, maxChars) {
+    const cells = document.querySelectorAll(selector);
+    cells.forEach(cell => {
+        const words = cell.innerText.trim().split(/\s+/);
+        let charCount = 0;
+        let limitedText = [];
+        let exceeded = false;
+
+        for (let i = 0; i < words.length; i++) {
+            if (charCount + words[i].length <= maxChars) {
+                limitedText.push(words[i]);
+                charCount += words[i].length + 1;
+            } else {
+                const remainingChars = maxChars - charCount;
+                if (remainingChars > 0) {
+                    limitedText.push(words[i].substring(0, remainingChars));
+                }
+                exceeded = true;
+                break;
+            }
+        }
+
+        cell.innerText = limitedText.join(' ') + (exceeded ? '...' : '');
+    });
+}
+
+limitWords('.text-limited', 20);
+</script>
+{% endblock  %}
